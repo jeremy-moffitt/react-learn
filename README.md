@@ -1,6 +1,6 @@
-# React Foundations
+# React Learning Path
 
-A browser-based tutorial for learning the fundamentals of a React application. It includes five short lessons, formatted code examples, course navigation, completion progress, and a working counter demo.
+A browser-based tutorial for learning React fundamentals and intermediate patterns. It includes ten short lessons, formatted code examples, course navigation, completion progress, and a working counter demo.
 
 ## Requirements
 

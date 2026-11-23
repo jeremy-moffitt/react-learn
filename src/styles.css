@@ -108,7 +108,7 @@ a:focus-visible {
   top: 68px;
   display: flex;
   height: calc(100vh - 68px);
-  min-height: 650px;
+  min-height: 0;
   flex-direction: column;
   padding: 39px 22px 24px;
   border-right: 1px solid #e8ebe4;
@@ -194,6 +194,13 @@ a:focus-visible {
 
 .nav-label {
   padding: 0 9px;
+}
+
+.lesson-nav {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .lesson-nav ol {
@@ -722,6 +729,11 @@ a:focus-visible {
   .course-heading > p:last-child,
   .sidebar-footer {
     display: none;
+  }
+
+  .lesson-nav {
+    flex: none;
+    overflow: visible;
   }
 
   .progress-card {
