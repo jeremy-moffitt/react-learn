@@ -157,4 +157,140 @@ export const lessons = [
     ],
     demo: "counter",
   },
+  {
+    id: "effects",
+    title: "Synchronize with the outside world",
+    shortTitle: "Effects",
+    duration: "8 min",
+    summary: "Use effects to synchronize React components with browser APIs and external systems.",
+    intro:
+      "An effect runs after React commits UI changes. It is appropriate for work that is synchronized outside the component, such as subscriptions, browser APIs, timers, or network requests.",
+    takeaways: [
+      "Render data first; use an effect only to synchronize with an external system.",
+      "Dependency arrays control when an effect re-runs.",
+      "Clean up subscriptions and timers to prevent stale work.",
+    ],
+    sections: [
+      {
+        heading: "Run an effect when a value changes",
+        body: "This effect updates the document title whenever the name changes. The dependency array ensures it does not run for unrelated state updates.",
+        codeLabel: "src/Profile.jsx",
+        language: "jsx",
+        code: "import { useEffect } from \"react\";\n\nfunction Profile({ name }) {\n  useEffect(() => {\n    document.title = `Profile: ${name}`;\n  }, [name]);\n\n  return <h1>{name}</h1>;\n}",
+      },
+      {
+        heading: "Clean up a subscription",
+        body: "Return a cleanup function when an effect starts work that must be stopped or removed.",
+        codeLabel: "src/ChatStatus.jsx",
+        language: "jsx",
+        code: "useEffect(() => {\n  const handleResize = () => {\n    console.log(window.innerWidth);\n  };\n\n  window.addEventListener(\"resize\", handleResize);\n  return () => window.removeEventListener(\"resize\", handleResize);\n}, []);",
+      },
+    ],
+  },
+  {
+    id: "controlled-forms",
+    title: "Build controlled forms",
+    shortTitle: "Forms",
+    duration: "8 min",
+    summary: "Connect form fields to state, handle submissions, and validate user input.",
+    intro:
+      "Controlled inputs store their visible value in React state. This gives the component a single source of truth and makes submission and validation behavior predictable.",
+    takeaways: [
+      "Set an input's value from state and update it through onChange.",
+      "Prevent the browser's default form submission behavior.",
+      "Keep user-friendly error state separate from the submitted data.",
+    ],
+    sections: [
+      {
+        heading: "Control an input",
+        body: "The value attribute receives the state value, while onChange updates state from the DOM event.",
+        codeLabel: "src/EmailForm.jsx",
+        language: "jsx",
+        code: "import { useState } from \"react\";\n\nfunction EmailForm() {\n  const [email, setEmail] = useState(\"\");\n\n  function handleSubmit(event) {\n    event.preventDefault();\n    console.log(\"Submitted:\", email);\n  }\n\n  return (\n    <form onSubmit={handleSubmit}>\n      <label htmlFor=\"email\">Email</label>\n      <input\n        id=\"email\"\n        type=\"email\"\n        value={email}\n        onChange={(event) => setEmail(event.target.value)}\n      />\n      <button type=\"submit\">Subscribe</button>\n    </form>\n  );\n}",
+      },
+    ],
+  },
+  {
+    id: "context",
+    title: "Share data with Context",
+    shortTitle: "Context",
+    duration: "9 min",
+    summary: "Pass shared application data through a component tree without prop drilling.",
+    intro:
+      "Context is useful for information that many components need, such as theme, locale, authentication, or selected account data. A provider publishes the value; consumers read the nearest provider.",
+    takeaways: [
+      "Create a context with a clear default or null fallback.",
+      "Wrap the relevant component tree in a Provider.",
+      "Read values with useContext instead of passing every value through props.",
+    ],
+    sections: [
+      {
+        heading: "Create and provide a context",
+        body: "The provider owns shared state and exposes both the state and the function that changes it.",
+        codeLabel: "src/ThemeContext.jsx",
+        language: "jsx",
+        code: "import { createContext, useContext, useState } from \"react\";\n\nconst ThemeContext = createContext(null);\n\nexport function ThemeProvider({ children }) {\n  const [theme, setTheme] = useState(\"light\");\n\n  return (\n    <ThemeContext.Provider value={{ theme, setTheme }}>\n      {children}\n    </ThemeContext.Provider>\n  );\n}\n\nexport function useTheme() {\n  return useContext(ThemeContext);\n}",
+      },
+      {
+        heading: "Consume the context",
+        body: "Any descendant of the provider can read or update the shared value.",
+        codeLabel: "src/ThemeButton.jsx",
+        language: "jsx",
+        code: "function ThemeButton() {\n  const { theme, setTheme } = useTheme();\n\n  return (\n    <button onClick={() => setTheme(theme === \"light\" ? \"dark\" : \"light\")}>\n      Switch to {theme === \"light\" ? \"dark\" : \"light\"}\n    </button>\n  );\n}",
+      },
+    ],
+  },
+  {
+    id: "reducers",
+    title: "Manage complex state with reducers",
+    shortTitle: "Reducers",
+    duration: "9 min",
+    summary: "Organize multi-step state transitions with useReducer and actions.",
+    intro:
+      "A reducer separates state-transition logic from event handling. It is helpful when several actions update one related piece of state or when the next state depends on several fields.",
+    takeaways: [
+      "A reducer receives the current state and an action, then returns next state.",
+      "Actions describe what happened rather than how to mutate state.",
+      "Create new state objects and arrays instead of mutating existing ones.",
+    ],
+    sections: [
+      {
+        heading: "Reduce explicit actions",
+        body: "The dispatch calls describe user actions. The reducer centralizes the rules for turning each action into the next state.",
+        codeLabel: "src/TaskList.jsx",
+        language: "jsx",
+        code: "import { useReducer } from \"react\";\n\nfunction taskReducer(tasks, action) {\n  switch (action.type) {\n    case \"added\":\n      return [...tasks, { id: action.id, text: action.text, done: false }];\n    case \"toggled\":\n      return tasks.map((task) =>\n        task.id === action.id ? { ...task, done: !task.done } : task,\n      );\n    default:\n      return tasks;\n  }\n}\n\nfunction TaskList() {\n  const [tasks, dispatch] = useReducer(taskReducer, []);\n\n  return (\n    <button onClick={() => dispatch({ type: \"added\", id: 1, text: \"Learn reducers\" })}>\n      Add task\n    </button>\n  );\n}",
+      },
+    ],
+  },
+  {
+    id: "custom-hooks-performance",
+    title: "Reuse logic and improve performance",
+    shortTitle: "Hooks & memo",
+    duration: "10 min",
+    summary: "Extract reusable stateful logic and apply memoization only where it helps.",
+    intro:
+      "Custom Hooks reuse stateful logic while keeping components composed. React also provides memoization tools for expensive calculations or stable callback and component values, but they should be added when profiling shows a need.",
+    takeaways: [
+      "Custom Hook names start with use and call other Hooks from the top level.",
+      "useMemo caches a calculated value; useCallback caches a function.",
+      "Start with clear code and measure performance before optimizing.",
+    ],
+    sections: [
+      {
+        heading: "Extract a custom Hook",
+        body: "This Hook can be reused by any component that needs to track the window width.",
+        codeLabel: "src/useWindowWidth.js",
+        language: "jsx",
+        code: "import { useEffect, useState } from \"react\";\n\nexport function useWindowWidth() {\n  const [width, setWidth] = useState(window.innerWidth);\n\n  useEffect(() => {\n    const updateWidth = () => setWidth(window.innerWidth);\n    window.addEventListener(\"resize\", updateWidth);\n    return () => window.removeEventListener(\"resize\", updateWidth);\n  }, []);\n\n  return width;\n}",
+      },
+      {
+        heading: "Memoize a repeated calculation",
+        body: "useMemo avoids repeating a calculation while dependencies are unchanged. It is not a general replacement for good component structure.",
+        codeLabel: "src/SearchResults.jsx",
+        language: "jsx",
+        code: "import { useMemo } from \"react\";\n\nfunction SearchResults({ items, query }) {\n  const matchingItems = useMemo(\n    () => items.filter((item) => item.includes(query)),\n    [items, query],\n  );\n\n  return <p>{matchingItems.length} results</p>;\n}",
+      },
+    ],
+  },
 ];
